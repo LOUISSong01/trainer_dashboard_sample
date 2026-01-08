@@ -1,0 +1,7 @@
+# 트레이너 대시보드 필수 패키지
+streamlit>=1.28.0
+psycopg2-binary>=2.9.0
+python-dotenv>=1.0.0
+pandas>=2.0.0
+plotly>=5.17.0
+

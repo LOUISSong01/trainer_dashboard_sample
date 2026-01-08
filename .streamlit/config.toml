@@ -1,0 +1,14 @@
+# Streamlit 설정
+
+[server]
+port = 8501
+enableCORS = true
+enableXsrfProtection = true
+
+[client]
+# 툴바 모드 설정
+toolbarMode = "auto"
+
+[runner]
+# 파일 변경 시 자동 재시작
+fastReruns = true
