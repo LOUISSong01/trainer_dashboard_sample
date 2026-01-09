@@ -43,6 +43,14 @@ def get_db_config():
         'password': os.getenv('DB_PASSWORD')
     }
 
+
+def validate_db_config(cfg: dict):
+    """필수 DB 설정이 모두 존재하는지 확인"""
+    required = ['host', 'port', 'database', 'user', 'password']
+    missing = [k for k in required if not cfg.get(k)]
+    return missing
+
+
 # 백엔드 API 베이스 URL
 def get_backend_base_url():
     return os.getenv("BACKEND_API_URL", "http://127.0.0.1:8000")
@@ -76,7 +84,21 @@ st.markdown("""
 @st.cache_resource
 def get_db_connection():
     config = get_db_config()
-    conn = psycopg2.connect(**config)
+    missing = validate_db_config(config)
+    if missing:
+        raise RuntimeError(f"DB 설정 누락: {', '.join(missing)} (Streamlit secrets.toml 또는 .env 확인)")
+
+    # 포트는 정수 변환, 배포 환경은 보통 SSL 필요
+    cfg = config.copy()
+    try:
+        cfg['port'] = int(cfg['port'])
+    except Exception:
+        raise RuntimeError("DB_PORT를 정수로 설정해주세요")
+
+    if 'sslmode' not in cfg:
+        cfg['sslmode'] = os.getenv('DB_SSLMODE', 'require')
+
+    conn = psycopg2.connect(**cfg)
     return conn
 
 def get_safe_connection():
